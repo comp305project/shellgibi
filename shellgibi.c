@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <fcntl.h>
+
 const char * sysname = "shellgibi";
 
 enum return_codes {
@@ -159,16 +161,19 @@ int parse_command(char *buf, struct command_t *command)
 
                 // handle input redirection
                 redirect_index=-1;
-                if (arg[0]=='<')
+                if (arg[0]=='<') 
+                        //read from file
                         redirect_index=0;
                 if (arg[0]=='>')
                 {
                         if (len>1 && arg[1]=='>')
                         {
+                                //append write
                                 redirect_index=2;
                                 arg++;
                                 len--;
                         }
+                        //rewrite
                         else redirect_index=1;
                 }
                 if (redirect_index != -1)
@@ -365,15 +370,37 @@ int process_command(struct command_t *command)
                 // set args[arg_count-1] (last) to NULL
                 command->args[command->arg_count-1]=NULL;
 
-                execvp(command->name, command->args); // exec+args+path
+                //execvp(command->name, command->args); // exec+args+path
+                
+                char path[2048]; //if not long enough.....
+                strcpy(path, "/bin/");
+                strcat(path, command->name); //also might be /usr/bin)
+                
+
+                if(strlen(command->redirects[0]) > 0){ //only 1 same symbol
+
+                }
+                if(strlen(command->redirects[1]) > 0){ //only 1 same symbol
+
+                }
+                if(strlen(command->redirects[2]) > 0){ //only 1 same symbol
+
+                }
+
+                execv(path, command->args);
+
+
+
                 exit(0);
                 /// TODO: do your own exec with path resolving using execv()
         }
         else
         {
                 if (!command->background)
-                        wait(0); // wait for child process to finish
+                        wait(0); // wait for child process to finish 
                 return SUCCESS;
+
+
         }
 
         // TODO: your implementation here
