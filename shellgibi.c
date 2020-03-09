@@ -359,36 +359,37 @@ int process_command(struct command_t *command) {
         
 
         if (strcmp(command->name, "alarm") == 0){
-        if (command->args[1] != NULL){
-            if (command->args[2] != NULL){
-                char *time = command->args[1];
-                char *filename = command->args[2];
-                char *hour = strtok(time, ".");
-                char *minute = strtok(NULL, ".");
+            if (command->args[1] != NULL){
+                if (command->args[2] != NULL){
+                    char *time = command->args[1];
+                    char *filename = command->args[2];
+                    char *hour = strtok(time, ".");
+                    char *minute = strtok(NULL, ".");
 
-                char command[1000] = "";
+                    char command[1000] = "";
 
-                strcat(command, "(crontab -l ; echo \"");
-                strcat(command, minute);
-                strcat(command, " ");
-                strcat(command, hour);
-                strcat(command, " * * * /usr/bin/aplay ");
-                strcat(command, filename);
-                strcat(command, "\") | sort - | uniq - | crontab -");
+                    strcat(command, "(crontab -l ; echo \"");
+                    strcat(command, minute);
+                    strcat(command, " ");
+                    strcat(command, hour);
+                    strcat(command, " * * * /usr/bin/aplay ");
+                    strcat(command, filename);
+                    strcat(command, "\") | sort - | uniq - | crontab -");
 
-                system(command);
+                    system(command);
+                }
             }
-        } else if (command->name == "myjobs") {
+        }
+        if (strcmp(command->name, "myjobs") == 0) {
             char *command = "ps -U ";
             char *username;
             getlogin_r(username, 1000);
+            printf("%s\n", username);
             strcat(command, username);
             system(command);
         }
-    }
 
         //execvp(command->name, command->args); // exec+args+path
-
         char path[2048]; //if not long enough.....
         strcpy(path, "/bin/");
         strcat(path, command->name); //also might be /usr/bin)
