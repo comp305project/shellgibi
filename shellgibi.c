@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <dirent.h>
 
 // header including our custom helper functions
 #include "helpers.h"

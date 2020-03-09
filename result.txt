@@ -1,4 +1,0 @@
-a.out
-helpers.h
-result.txt
-shellgibi.c
