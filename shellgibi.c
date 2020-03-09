@@ -332,29 +332,7 @@ int process_command(struct command_t *command) {
             return SUCCESS;
         }
     }
-    if (strcmp(command->name, "alarm") == 0){
-        if (command->args[1] != NULL){
-            if (command->args[2] != NULL){
-                char *time = command->args[1];
-                char *filename = command->args[2];
-                char *hour = strtok(time, ".");
-                char *minute = strtok(NULL, ".");
-
-                char command[1000] = "";
-
-                strcat(command, "(crontab -l ; echo \"");
-                strcat(command, minute);
-                strcat(command, " ");
-                strcat(command, hour);
-                strcat(command, " * * * /usr/bin/aplay ");
-                strcat(command, filename);
-                strcat(command, "\") | sort - | uniq - | crontab -");
-
-                system(command);
-            }
-        }
-    }
-
+    
     pid_t pid = fork();
     if (pid == 0) // child
     {
@@ -378,6 +356,36 @@ int process_command(struct command_t *command) {
         command->args[0] = strdup(command->name);
         // set args[arg_count-1] (last) to NULL
         command->args[command->arg_count - 1] = NULL;
+        
+
+        if (strcmp(command->name, "alarm") == 0){
+        if (command->args[1] != NULL){
+            if (command->args[2] != NULL){
+                char *time = command->args[1];
+                char *filename = command->args[2];
+                char *hour = strtok(time, ".");
+                char *minute = strtok(NULL, ".");
+
+                char command[1000] = "";
+
+                strcat(command, "(crontab -l ; echo \"");
+                strcat(command, minute);
+                strcat(command, " ");
+                strcat(command, hour);
+                strcat(command, " * * * /usr/bin/aplay ");
+                strcat(command, filename);
+                strcat(command, "\") | sort - | uniq - | crontab -");
+
+                system(command);
+            }
+        } else if (command->name == "myjobs") {
+            char *command = "ps -U ";
+            char *username;
+            getlogin_r(username, 1000);
+            strcat(command, username);
+            system(command);
+        }
+    }
 
         //execvp(command->name, command->args); // exec+args+path
 
