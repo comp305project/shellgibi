@@ -366,25 +366,52 @@ int process_command(struct command_t *command) {
                     char *hour = strtok(time, ".");
                     char *minute = strtok(NULL, ".");
 
-                    char command[1000] = "";
+                    char cmd[1000] = "";
 
-                    strcat(command, "(crontab -l ; echo \"");
-                    strcat(command, minute);
-                    strcat(command, " ");
-                    strcat(command, hour);
-                    strcat(command, " * * * /usr/bin/aplay ");
-                    strcat(command, filename);
-                    strcat(command, "\") | sort - | uniq - | crontab -");
+                    strcat(cmd, "(crontab -l ; echo \"");
+                    strcat(cmd, minute);
+                    strcat(cmd, " ");
+                    strcat(cmd, hour);
+                    strcat(cmd, " * * * /usr/bin/aplay ");
+                    strcat(cmd, filename);
+                    strcat(cmd, "\") | sort - | uniq - | crontab -");
 
-                    system(command);
+                    system(cmd);
                 }
             }
         }
         if (strcmp(command->name, "myjobs") == 0) {
-            char *command = "ps -U $USER";
-            system(command);
+            char *cmd = "ps -U $USER";
+            system(cmd);
         }
 
+        if (strcmp(command->name, "pause") == 0) {
+            if (command->args[1] != NULL){
+                char cmd[1000]="";
+                strcat(cmd, "kill -STOP ");
+                strcat(cmd, command->args[1]);
+                system(cmd);
+            }
+        }
+
+        if (strcmp(command->name, "mybg") == 0) {
+            if (command->args[1] != NULL){
+                char cmd[1000]="";
+                strcat(cmd, "kill -CONT ");
+                strcat(cmd, command->args[1]);
+                system(cmd);
+            }
+        }
+
+        
+        if (strcmp(command->name, "myfg") == 0) {
+            if (command->args[1] != NULL){
+                char cmd[1000]=""; 
+                strcat(cmd, "kill -CONT ");
+                strcat(cmd, command->args[1]);
+                system(cmd);
+            }
+        }
         //execvp(command->name, command->args); // exec+args+path
         char path[2048]; //if not long enough.....
         strcpy(path, "/bin/");
