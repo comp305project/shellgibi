@@ -381,11 +381,7 @@ int process_command(struct command_t *command) {
             }
         }
         if (strcmp(command->name, "myjobs") == 0) {
-            char *command = "ps -U ";
-            char *username;
-            getlogin_r(username, 1000);
-            printf("%s\n", username);
-            strcat(command, username);
+            char *command = "ps -U $USER";
             system(command);
         }
 
