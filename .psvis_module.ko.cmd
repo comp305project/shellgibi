@@ -1,0 +1,1 @@
+cmd_/home/egeerdogan/Desktop/304/project_01/psvis_module.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/egeerdogan/Desktop/304/project_01/psvis_module.ko /home/egeerdogan/Desktop/304/project_01/psvis_module.o /home/egeerdogan/Desktop/304/project_01/psvis_module.mod.o;  true
