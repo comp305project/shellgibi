@@ -5,6 +5,10 @@
 #include <linux/slab.h>
 #include <linux/moduleparam.h>
 #include <linux/sched/signal.h>
+#include <linux/fs.h>
+#include <asm/segment.h>
+#include <asm/uaccess.h>
+#include <linux/buffer_head.h>
 
 void print_children(struct task_struct *task, int level) {
   struct list_head *list;
@@ -12,6 +16,12 @@ void print_children(struct task_struct *task, int level) {
   list_for_each(list, &task->children) {
     sibling = list_entry(list, struct task_struct, sibling);
     printk(KERN_INFO "[%d] Child: %d\n", level, sibling->pid);
+
+    struct file * f = filp_open("/home/egeerdogan/Desktop/304/project_01/ps.txt", O_CREAT |  O_RDWR | O_APPEND, S_IRWXU | S_IRWXG | S_IRWXO);
+    char *str = "hi\n";
+    up_write(f, 0, str, strlen(str));
+    filp_close(f, NULL);
+
     print_children(sibling, level+1);
   }
 }
