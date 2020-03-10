@@ -12,6 +12,10 @@
 // header including our custom helper functions
 #include "helpers.h"
 
+// for pipes
+#define WRITE_END 1
+#define READ_END  0
+
 const char *sysname = "shellgibi";
 
 enum return_codes {
@@ -26,6 +30,8 @@ struct command_t {
     int arg_count;
     char **args;
     char *redirects[3]; // in/out redirection
+    int incoming_pipe[2];
+    bool read_from_pipe;
     struct command_t *next; // for piping
 };
 
@@ -48,8 +54,6 @@ void print_command(struct command_t *command) {
         printf("\tPiped to:\n");
         print_command(command->next);
     }
-
-
 }
 
 /**
@@ -332,10 +336,9 @@ int process_command(struct command_t *command) {
             return SUCCESS;
         }
     }
-    
+
     pid_t pid = fork();
-    if (pid == 0) // child
-    {
+    if (pid == 0) { // child
         /// This shows how to do exec with environ (but is not available on MacOs)
         // extern char** environ; // environment variables
         // execvpe(command->name, command->args, environ); // exec+args+path+environ
@@ -356,7 +359,7 @@ int process_command(struct command_t *command) {
         command->args[0] = strdup(command->name);
         // set args[arg_count-1] (last) to NULL
         command->args[command->arg_count - 1] = NULL;
-        
+
 
         if (strcmp(command->name, "alarm") == 0){
             if (command->args[1] != NULL){
@@ -379,22 +382,24 @@ int process_command(struct command_t *command) {
                     system(cmd);
                 }
             }
-        }
-        if (strcmp(command->name, "myjobs") == 0) {
+        } else if (strcmp(command->name, "myjobs") == 0) {
             char *cmd = "ps -U $USER";
             system(cmd);
-        }
-
-        if (strcmp(command->name, "pause") == 0) {
+        } else if (strcmp(command->name, "pause") == 0) {
             if (command->args[1] != NULL){
                 char cmd[1000]="";
                 strcat(cmd, "kill -STOP ");
                 strcat(cmd, command->args[1]);
                 system(cmd);
             }
-        }
-
-        if (strcmp(command->name, "mybg") == 0) {
+        } else if (strcmp(command->name, "mybg") == 0) {
+            if (command->args[1] != NULL){
+                char cmd[1000]="";
+                strcat(cmd, "kill -CONT ");
+                strcat(cmd, command->args[1]);
+                system(cmd);
+            }
+        } else if (strcmp(command->name, "myfg") == 0) {
             if (command->args[1] != NULL){
                 char cmd[1000]="";
                 strcat(cmd, "kill -CONT ");
@@ -403,15 +408,6 @@ int process_command(struct command_t *command) {
             }
         }
 
-        
-        if (strcmp(command->name, "myfg") == 0) {
-            if (command->args[1] != NULL){
-                char cmd[1000]=""; 
-                strcat(cmd, "kill -CONT ");
-                strcat(cmd, command->args[1]);
-                system(cmd);
-            }
-        }
         //execvp(command->name, command->args); // exec+args+path
         char path[2048]; //if not long enough.....
         strcpy(path, "/bin/");
@@ -435,19 +431,55 @@ int process_command(struct command_t *command) {
             out_file = open(command->redirects[2], O_RDWR | O_CREAT | O_APPEND, 0666);
         }
 
+        // will read from pipe
+        if (command->read_from_pipe) {
+          printf("5.\n");
+          close(stdin_no);
+
+          printf("6.\n");
+          in_file = command->incoming_pipe[READ_END];
+
+          printf("7.\n");
+          dup2(in_file, stdin_no);
+
+          printf("8.\n");
+          close(command->incoming_pipe[READ_END]);
+          close(command->incoming_pipe[WRITE_END]);
+
+          printf("9.\n");
+          printf("10.\n");
+        }
+
+        // will pipe output to next command
+        if (command->next != NULL) {
+          pipe(command->incoming_pipe);
+          pipe(command->next->incoming_pipe);
+          command->next->read_from_pipe = true;
+
+          printf("1.\n");
+          out_file = command->next->incoming_pipe[WRITE_END];
+
+          printf("2.\n");
+          close(stdout_no);
+          printf("2.5\n");
+          dup2(out_file, stdout_no);
+          // dup2(in_file, STDIN_FILENO);
+
+          printf("3.\n");
+          close(command->incoming_pipe[READ_END]);
+          close(command->incoming_pipe[WRITE_END]);
+
+          printf("4.\n");
+          process_command(command->next);
+
+        }
+
         // redirect stdin and stdout
-        dup2(out_file, STDOUT_FILENO);
-        dup2(in_file, STDIN_FILENO);
+        // dup2(out_file, STDOUT_FILENO);
+        // dup2(in_file, STDIN_FILENO);
 
+        printf("Executing: %s\n", command->name);
         execv(path, command->args);
-
-        // redirect output back to stdout after command executes
-        dup2(stdout_no, STDOUT_FILENO);
-        dup2(stdin_no, STDIN_FILENO);
-        close(out_file);
-        close(in_file);
-        close(stdout_no);
-        close(stdin_no);
 
         exit(0);
         /// TODO: do your own exec with path resolving using execv()
