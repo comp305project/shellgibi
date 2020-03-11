@@ -3,10 +3,17 @@
 #include <regex.h>
 #include <string.h>
 
-struct array_struct {
-  int count;
-  char *array[10000];
-};
+void list_working_dir() {
+  DIR *d;
+  struct dirent *dir;
+  d = opendir(".");
+  if (d) {
+    while ((dir = readdir(d)) != NULL) {
+      printf("%s\n", dir->d_name);
+    }
+    closedir(d);
+  }
+}
 
 int match_count(char *start_pattern) {
   regex_t regex;
