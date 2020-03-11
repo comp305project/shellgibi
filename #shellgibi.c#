@@ -358,10 +358,12 @@ int process_command(struct command_t *command) {
 
         if (command->auto_complete) {
           command->name[strlen(command->name) - 1] = 0; // remove last ?
-          list_commands(command->name);
-          // > 1 matches
-          // 1 match
-          //   1 match and equal
+          struct array_struct match_result = list_commands(command->name);
+
+          printf("\n");
+          // > 1 matches => show all
+          // 1 match => complete
+          //   1 match and equal => list current directory
         }
 
         if (strcmp(command->name, "alarm") == 0){
