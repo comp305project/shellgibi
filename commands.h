@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int show_covid_status() {
+  FILE *apifile;
+
+  system("curl --silent https://wuhan-coronavirus-api.laeyoung.endpoint.ainize.ai/jhu-edu/brief > covid-api.txt");
+  apifile = fopen("covid-api.txt", "r");
+
+  if (apifile < 0) {
+    printf("Cannot establish network connection. Try again later\n");
+    return 1;
+  }
+
+  char text[100];
+  fscanf(apifile, "%s", text);
+
+  char *token;
+  int cases[3];
+  int token_count = 0;
+  token = strtok(text, ":,}");
+  while (token != NULL) {
+    if (token_count % 2 == 1) {
+      cases[token_count / 2] = atoi(token);
+    }
+    token = strtok(NULL, ":,}");
+    token_count++;
+  }
+
+  printf("--- COVID-19 Live Status ---\n");
+  printf("Confirmed: \t%d\n", cases[0]);
+  printf("Deaths: \t%d\n", cases[1]);
+  printf("Recovered: \t%d\n", cases[2]);
+  printf("----------------------------\n");
+
+  fclose(apifile);
+  system("rm covid-api.txt");
+
+  return 0;
+}
