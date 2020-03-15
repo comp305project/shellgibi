@@ -1,9 +1,0 @@
-total 10232
--rwxrwxr-x. 1 egeerdogan egeerdogan    33056 Mar 15 17:24 a.out
--rw-rw-r--. 1 egeerdogan egeerdogan     2417 Mar 15 15:12 commands.h
--rw-rw-r--. 1 egeerdogan egeerdogan       18 Mar 15 14:47 covid.txt
--rw-rw-r--. 1 egeerdogan egeerdogan     1749 Mar 15 14:47 helpers.h
--rw-rw-r--. 1 egeerdogan egeerdogan      635 Mar 15 16:56 pipe-test.c
--rw-rw-r--. 1 egeerdogan egeerdogan    14319 Mar 15 17:23 shellgibi.c
--rw-rw-r--. 1 egeerdogan egeerdogan 10406738 Mar 10 20:32 test.wav
--rw-rw-r--. 1 egeerdogan egeerdogan        0 Mar 15 17:24 virus.txt
