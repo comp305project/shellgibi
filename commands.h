@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct command_t {
   char *name;
@@ -9,6 +10,8 @@ struct command_t {
   int arg_count;
   char **args;
   char *redirects[3];
+  bool read_from_pipe;
+  int incoming_pipe[2];
   struct command_t *next;
 };
 
