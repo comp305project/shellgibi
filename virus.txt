@@ -1,0 +1,5 @@
+--- COVID-19 Live Status ---
+Confirmed: 	156005
+Deaths: 	5819
+Recovered: 	72624
+----------------------------
