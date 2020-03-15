@@ -83,5 +83,23 @@ void myfg(struct command_t *command) {
 }
 
 void alarm_command(struct command_t *command) {
+  if (command->args[1] != NULL) {
+    if (command-> args[2] != NULL) {
+      char *time = command->args[1];
+      char *filename = command->args[2];
+      char *hour = strtok(time, ".");
+      char *minute = strtok(NULL, ".");
+      char cmd[100] = "";
 
+      strcat(cmd, "(crontab -l ; echo \"");
+      strcat(cmd, minute);
+      strcat(cmd, " ");
+      strcat(cmd, hour);
+      strcat(cmd, "* * * /usr/bin/aplay ");
+      strcat(cmd, filename);
+      strcat(cmd, "\") | sort - | uniq - | crontab -");
+
+      system(cmd);
+    }
+  }
 }
